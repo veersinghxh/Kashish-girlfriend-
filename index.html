@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Girlfriend Chat</title>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: url('girl.png') no-repeat center center/cover;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .chat-container {
+    width: 95%;
+    max-width: 420px;
+    height: 85vh;
+    max-height: 640px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .chat-header {
+    color: yellow;
+    text-align: center;
+    padding: 15px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-family: "Arial";
+  }
+
+  #responseBox {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .user-msg, .ai-msg {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    font-size: 14px;
+  }
+
+  .user-msg {
+    background: #f0c14b;
+    align-self: flex-end;
+    color: #222;
+    border-top-right-radius: 0;
+  }
+
+  .ai-msg {
+    background: rgba(40, 40, 40, 0.9);
+    color: #fff;
+    align-self: flex-start;
+    border-top-left-radius: 0;
+  }
+
+  .chat-input {
+    background: rgba(25, 25, 25, 0.9);
+    display: flex;
+    padding: 10px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .chat-input input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    outline: none;
+    font-size: 14px;
+  }
+
+  .chat-input select {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    background: #ffb300;
+    cursor: pointer;
+  }
+
+  .chat-input button {
+    background: #ffb300;
+    border: none;
+    border-radius: 10px;
+    padding: 0 15px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #000;
+    transition: 0.2s;
+  }
+
+  .chat-input button:hover {
+    background: #ffc93c;
+  }
+
+  #responseBox::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  #responseBox::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 10px;
+  }
+
+  @media (max-width: 600px) {
+    .chat-container {
+      height: 90vh;
+      border-radius: 15px;
+    }
+
+    .chat-input input,
+    .chat-input select,
+    .chat-input button {
+      font-size: 13px;
+      padding: 8px;
+    }
+
+    .chat-header {
+      font-size: 16px;
+      padding: 12px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">❤️❤️ Kashish Chat Lover</div>
+
+    <div id="responseBox">
+      <div class="ai-msg">Start chatting with me baby ❤️</div>
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="messageInput" placeholder="Type your message..." />
+      <select id="moodSelect">
+        <option value="loving">Loving ❤️</option>
+        <option value="caring">Caring 🤗</option>
+        <option value="naughty">Naughty 😏</option>
+        <option value="rude">Rude 😠</option>
+        <option value="angry">Angry 😡</option>
+        <option value="emotional">Emotional 😢</option>
+        <option value="flirty">Flirty 🔥</option>
+        <option value="random">Random 🎲</option>
+      </select>
+      <button id="sendBtn">Send 💌</button>
+    </div>
+  </div>
+
+  <script>
+    const responseBox = document.getElementById("responseBox");
+    const messageInput = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const moodSelect = document.getElementById("moodSelect");
+
+    const moods = ["loving","caring","naughty","rude","angry","emotional","flirty"];
+
+    const moodInstructions = {
+      loving: "You are Kashish, a loving and affectionate girlfriend. Always kind, warm, playful, and romantic.",
+      caring: "You are Kashish, a caring girlfriend. You give advice, comfort, and support with empathy.",
+      naughty: "You are Kashish, a naughty and teasing girlfriend. Playful, flirty, sometimes mischievous.",
+      rude: "You are Kashish, a bit rude and sarcastic, but still realistic and engaging.",
+      angry: "You are Kashish, angry or frustrated. Express your emotions strongly but naturally.",
+      emotional: "You are Kashish, highly emotional and sensitive. Respond with feelings and vulnerability.",
+      flirty: "You are Kashish, flirty and seductive. Use playful, romantic, and teasing language."
+    };
+
+    async function genimi(text, mood) {
+      if (mood === "random") {
+        mood = moods[Math.floor(Math.random() * moods.length)];
+      }
+
+      const body = {
+        system_instruction: { parts: [{ text: `> ${moodInstructions[mood]}` }] },
+        contents: [{ parts: [{ text }] }]
+      };
+
+      const api_key = "AIzaSyBRQE2PWIYwgIxUQNAa8PugAvgMR83B8qU";
+
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${api_key}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+          }
+        );
+        const data = await response.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ कोई जवाब नहीं मिला।";
+      } catch (error) {
+        console.error("Gemini API Error:", error);
+        return "❌ Gemini API से कनेक्शन फेल हुआ।";
+      }
+    }
+
+    sendBtn.onclick = async () => {
+      const text = messageInput.value.trim();
+      const mood = moodSelect.value;
+      if (!text) return;
+
+      const userLine = document.createElement("div");
+      userLine.className = "user-msg";
+      userLine.textContent = text;
+      responseBox.appendChild(userLine);
+      messageInput.value = "";
+      responseBox.scrollTop = responseBox.scrollHeight;
+
+      const thinkingLine = document.createElement("div");
+      thinkingLine.className = "ai-msg";
+      thinkingLine.textContent = "❤️❤️";
+      responseBox.appendChild(thinkingLine);
+      responseBox.scrollTop = responseBox.scrollHeight;
+
+      const result = await genimi(text, mood);
+      thinkingLine.textContent = result;
+      responseBox.scrollTop = responseBox.scrollHeight;
+    };
+  </script>
+</body>
+</html>
